@@ -1,11 +1,16 @@
 import type { Dispatch, SetStateAction } from 'react'
-import { createContext, use, useEffect, useState } from 'react'
+import { createContext, Suspense, use, useEffect, useState } from 'react'
 
 import { useBrowserNativeTransitions } from './browser-native-events'
 
 const ViewTransitionsContext = createContext<
   Dispatch<SetStateAction<(() => void) | null>>
 >(null)
+
+const BrowserNativeTransitionListener = () => {
+  useBrowserNativeTransitions()
+  return null;
+}
 
 export function ViewTransitions({
   children,
@@ -23,10 +28,11 @@ export function ViewTransitions({
     }
   }, [finishViewTransition])
 
-  useBrowserNativeTransitions()
-
   return (
     <ViewTransitionsContext.Provider value={setFinishViewTransition}>
+      <Suspense fallback={null}>
+        <BrowserNativeTransitionListener />
+      </Suspense>
       {children}
     </ViewTransitionsContext.Provider>
   )
