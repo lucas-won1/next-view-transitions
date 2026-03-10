@@ -9,8 +9,10 @@ const ViewTransitionsContext = createContext<
 
 export function ViewTransitions({
   children,
+  enabled = true,
 }: Readonly<{
   children: React.ReactNode
+  enabled?: boolean
 }>) {
   const [finishViewTransition, setFinishViewTransition] = useState<
     null | (() => void)
@@ -23,7 +25,7 @@ export function ViewTransitions({
     }
   }, [finishViewTransition])
 
-  useBrowserNativeTransitions()
+  useBrowserNativeTransitions(enabled)
 
   return (
     <ViewTransitionsContext.Provider value={setFinishViewTransition}>

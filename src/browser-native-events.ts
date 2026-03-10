@@ -6,7 +6,7 @@ import { useHash } from './use-hash'
 // Suspense boundaries during a route transition. But it should work fine for
 // the most common use cases.
 
-export function useBrowserNativeTransitions() {
+export function useBrowserNativeTransitions(enabled: boolean) {
   const pathname = usePathname()
   const currentPathname = useRef(pathname)
 
@@ -22,7 +22,7 @@ export function useBrowserNativeTransitions() {
   >(null)
 
   useEffect(() => {
-    if (!('startViewTransition' in document)) {
+    if (!enabled || !('startViewTransition' in document)) {
       return () => {}
     }
 
@@ -51,9 +51,9 @@ export function useBrowserNativeTransitions() {
     return () => {
       window.removeEventListener('popstate', onPopState)
     }
-  }, [])
+  }, [enabled])
 
-  if (currentViewTransition && currentPathname.current !== pathname) {
+  if (enabled && currentViewTransition && currentPathname.current !== pathname) {
     // Whenever the pathname changes, we block the rendering of the new route
     // until the view transition is started (i.e. DOM screenshotted).
     use(currentViewTransition[0])
@@ -61,6 +61,7 @@ export function useBrowserNativeTransitions() {
 
   // Keep the transition reference up-to-date.
   const transitionRef = useRef(currentViewTransition)
+
   useEffect(() => {
     transitionRef.current = currentViewTransition
   }, [currentViewTransition])
